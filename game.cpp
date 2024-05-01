@@ -5,26 +5,35 @@
 // Copyright   : (c) Reserved
 // Description : Basic 2D game of Centipede...
 //============================================================================
-
-#ifndef CENTIPEDE_CPP_
-#define CENTIPEDE_CPP_
+#ifndef Game_CPP
+#define Game_CPP
+#include "game.h"
 #include "util.h"
 #include <iostream>
 #include<string>
 #include<cmath> // for basic math functions such as cos, sin, sqrt
 using namespace std;
 
+// --------------------------------------------------------
+// Game object that is the only global variable in the code
+// --------------------------------------------------------
+Game game;
+// --------------------------------------------------------
+// --------------------------------------------------------
+
+
 // seed the random numbers generator by current time (see the documentation of srand for further help)...
+int version = 0;
 
 /* Function sets canvas size (drawing area) in pixels...
  *  that is what dimensions (x and y) your game will have
  *  Note that the bottom-left coordinate has value (0,0) and top-right coordinate has value (width-1,height-1)
  * */
 void SetCanvasSize(int width, int height) {
-	glMatrixMode (GL_PROJECTION);
+	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(0, width, 0, height, -1, 1); // set the screen size to given width and height.
-	glMatrixMode (GL_MODELVIEW);
+	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 }
 
@@ -32,39 +41,22 @@ void SetCanvasSize(int width, int height) {
 /*
  * Main Canvas drawing function.
  * */
-int dx=400;
+
+
 void GameDisplay()/**/{
 	// set the background color using function glClearColor.
 	// to change the background play with the red, green and blue values below.
 	// Note that r, g and b values must be in the range [0,1] where 0 means dim rid and 1 means pure red and so on.
 
-	glClearColor(0/*Red Component*/, 0,	//148.0/255/*Green Component*/,
-			0.0/*Blue Component*/, 0 /*Alpha component*/); // Red==Green==Blue==1 --> White Colour
-	glClear (GL_COLOR_BUFFER_BIT); //Update the colors
-	//Fire Gun
-	
-	DrawSquare( dx , 20 ,40,colors[RED]); 
-	//Mushroom
-	DrawSquare( 250 , 250 ,20,colors[GREEN]); 
-	//Display Score
-	DrawString( 50, 800, "Score=0", colors[MISTY_ROSE]);
-	//Spider
-	DrawTriangle( 300, 450 , 340, 450 , 320 , 490, colors[MISTY_ROSE] ); 
-	// Trianlge Vertices v1(300,50) , v2(500,50) , v3(400,250)
+	glClearColor(0.1/*Red Component*/, 0,	//148.0/255/*Green Component*/,
+		0.0/*Blue Component*/, 0 /*Alpha component*/); // Red==Green==Blue==1 --> White Colour
+	glClear(GL_COLOR_BUFFER_BIT); //Update the colors
 
 
-	//DrawLine(int x1, int y1, int x2, int y2, int lwidth, float *color)
-	DrawLine( 550 , 50 ,  550 , 480 , 10 , colors[MISTY_ROSE] );	
-	
-	DrawCircle(50,670,10,colors[RED]);
-	DrawCircle(70,670,10,colors[RED]);
-	DrawCircle(90,670,10,colors[RED]);
-	DrawRoundRect(500,200,50,100,colors[DARK_SEA_GREEN],70);
-	DrawRoundRect(100,200,100,50,colors[DARK_OLIVE_GREEN],20);	
-	DrawRoundRect(100,100,50,100,colors[DARK_OLIVE_GREEN],30);
-	DrawRoundRect(200,100,100,50,colors[LIME_GREEN],40);
-	DrawRoundRect(350,100,100,50,colors[LIME_GREEN],20);
-	
+	// draw the games contents
+	game.draw_stage();
+
+
 	glutSwapBuffers(); // do not modify this line..
 
 }
@@ -80,22 +72,27 @@ void GameDisplay()/**/{
  * */
 
 void NonPrintableKeys(int key, int x, int y) {
+
 	if (key
-			== GLUT_KEY_LEFT /*GLUT_KEY_LEFT is constant and contains ASCII for left arrow key*/) {
+		== GLUT_KEY_LEFT /*GLUT_KEY_LEFT is constant and contains ASCII for left arrow key*/) {
 		// what to do when left key is pressed...
-		
 
-	} else if (key
-			== GLUT_KEY_RIGHT /*GLUT_KEY_RIGHT is constant and contains ASCII for right arrow key*/) {
-	dx++;
 
-	} else if (key
-			== GLUT_KEY_UP/*GLUT_KEY_UP is constant and contains ASCII for up arrow key*/) {
+	}
+	else if (key
+		== GLUT_KEY_RIGHT /*GLUT_KEY_RIGHT is constant and contains ASCII for right arrow key*/) {
+
+
+	}
+	else if (key
+		== GLUT_KEY_UP/*GLUT_KEY_UP is constant and contains ASCII for up arrow key*/) {
+
 
 	}
 
 	else if (key
-			== GLUT_KEY_DOWN/*GLUT_KEY_DOWN is constant and contains ASCII for down arrow key*/) {
+		== GLUT_KEY_DOWN/*GLUT_KEY_DOWN is constant and contains ASCII for down arrow key*/) {
+
 
 	}
 
@@ -116,10 +113,14 @@ void PrintableKeys(unsigned char key, int x, int y) {
 		exit(1); // exit the program when escape key is pressed.
 	}
 
-	if (key == 'b' || key == 'B') //Key for placing the bomb
-			{
-		//do something if b is pressed
-		cout << "b pressed" << endl;
+	if (key == 'p' || key == 'P') //Key for placing the bomb
+	{
+		// set stage to move to game play
+		int stage = game.get_stage();
+		if (stage == 0)
+		{
+			game.set_stage(1);
+		}
 
 	}
 	glutPostRedisplay();
@@ -167,12 +168,13 @@ void MouseMoved(int x, int y) {
 void MouseClicked(int button, int state, int x, int y) {
 
 	if (button == GLUT_LEFT_BUTTON) // dealing only with left button
-			{
+	{
 		cout << GLUT_DOWN << " " << GLUT_UP << endl;
 
-	} else if (button == GLUT_RIGHT_BUTTON) // dealing with right button
-			{
-			cout<<"Right Button Pressed"<<endl;
+	}
+	else if (button == GLUT_RIGHT_BUTTON) // dealing with right button
+	{
+		cout << "Right Button Pressed" << endl;
 
 	}
 	glutPostRedisplay();
@@ -180,9 +182,11 @@ void MouseClicked(int button, int state, int x, int y) {
 /*
  * our gateway main function
  * */
-int main(int argc, char*argv[]) {
+int main(int argc, char* argv[]) {
 
-	int width = 1020, height = 840; // i have set my window size to be 800 x 600
+	game.init();
+
+	int width = 1000, height = 600; // i have set my window size to be 800 x 600
 
 	InitRandomizer(); // seed the random number generator...
 	glutInit(&argc, argv); // initialize the graphics library...
