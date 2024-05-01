@@ -48,7 +48,7 @@ void GameDisplay()/**/{
 	// to change the background play with the red, green and blue values below.
 	// Note that r, g and b values must be in the range [0,1] where 0 means dim rid and 1 means pure red and so on.
 
-	glClearColor(0.1/*Red Component*/, 0,	//148.0/255/*Green Component*/,
+	glClearColor(0/*Red Component*/, 0,	//148.0/255/*Green Component*/,
 		0.0/*Blue Component*/, 0 /*Alpha component*/); // Red==Green==Blue==1 --> White Colour
 	glClear(GL_COLOR_BUFFER_BIT); //Update the colors
 
@@ -110,7 +110,7 @@ void NonPrintableKeys(int key, int x, int y) {
  * */
 void PrintableKeys(unsigned char key, int x, int y) {
 	if (key == 27/* Escape key ASCII*/) {
-		exit(1); // exit the program when escape key is pressed.
+		// exit(1); // exit the program when escape key is pressed.
 	}
 
 	if (key == 'p' || key == 'P') //Key for placing the bomb
@@ -122,6 +122,10 @@ void PrintableKeys(unsigned char key, int x, int y) {
 			game.set_stage(1);
 		}
 
+	}
+	if (key == 'e' || key == 'E') //Key for placing the bomb
+	{
+		exit(1); // exit the program when escape key is pressed.
 	}
 	glutPostRedisplay();
 }
