@@ -1,12 +1,14 @@
 #ifndef GAME_H
 #define GAME_H
 #include "util.h"
+#include "gameplay.h"
 using namespace std;
 
 class Game
 {
 private:
 
+    GamePlay* gameplay;
     int stage;
     int width, height;
 
@@ -35,6 +37,7 @@ public:
     // initialize the game components for the game startup
     void init()
     {
+        gameplay = nullptr;
         stage = 0;
         width = 1000;
         height = 600;
@@ -43,6 +46,8 @@ public:
     // draw the components that are supposed to be on the display
     void draw_stage()
     {
+        if (gameplay == nullptr)
+            gameplay = new GamePlay;
         switch (stage)
         {
         case 0:
@@ -60,12 +65,13 @@ public:
     {
         drawText("Brick Breaker", width / 2 - 60, height / 3 * 2 + 100);
         drawText("Press 'P' to play", width / 2 - 70, height / 3 + 50);
-        drawText("Press 'E' to Exit", width / 2 - 70, height / 3 + 0);
+        drawText("Press 'Esc' to Exit", width / 2 - 72, height / 3 + 0);
     }
 
     void stage_1()
     {
-        DrawSquare(0, 0, 100, colors[RED]);
+        // DrawSquare(0, 0, 100, colors[RED]);
+        gameplay[0].draw_game();
     }
 
     int get_stage()
@@ -75,6 +81,24 @@ public:
     void set_stage(int x)
     {
         stage = x;
+    }
+
+    // board functions here
+    float get_board_b()
+    {
+        return gameplay[0].get_board_b();
+    }
+    float get_board_t()
+    {
+        return gameplay[0].get_board_t();
+    }
+    void set_board_b(float x)
+    {
+        gameplay[0].set_board_b(x);
+    }
+    void set_board_t(float x)
+    {
+        gameplay[0].set_board_t(x);
     }
 };
 

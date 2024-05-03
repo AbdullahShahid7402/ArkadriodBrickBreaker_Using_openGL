@@ -23,7 +23,6 @@ Game game;
 
 
 // seed the random numbers generator by current time (see the documentation of srand for further help)...
-int version = 0;
 
 /* Function sets canvas size (drawing area) in pixels...
  *  that is what dimensions (x and y) your game will have
@@ -110,7 +109,7 @@ void NonPrintableKeys(int key, int x, int y) {
  * */
 void PrintableKeys(unsigned char key, int x, int y) {
 	if (key == 27/* Escape key ASCII*/) {
-		// exit(1); // exit the program when escape key is pressed.
+		exit(1); // exit the program when escape key is pressed.
 	}
 
 	if (key == 'p' || key == 'P') //Key for placing the bomb
@@ -123,9 +122,23 @@ void PrintableKeys(unsigned char key, int x, int y) {
 		}
 
 	}
-	if (key == 'e' || key == 'E') //Key for placing the bomb
+	// if (key == 'e' || key == 'E') //Key for placing the bomb
+	// {
+	// 	exit(1); // exit the program when escape key is pressed.
+	// }
+	if (game.get_stage() == 1 && key == 'w' || key == 'W') //Key for placing the bomb
 	{
-		exit(1); // exit the program when escape key is pressed.
+		// move board to the left
+		float x = game.get_board_t();
+		x -= 10;
+		game.set_board_t(x);
+	}
+	if (game.get_stage() == 1 && key == 'r' || key == 'R') //Key for placing the bomb
+	{
+		// move board to the left
+		float x = game.get_board_t();
+		x += 10;
+		game.set_board_t(x);
 	}
 	glutPostRedisplay();
 }
@@ -140,9 +153,9 @@ void PrintableKeys(unsigned char key, int x, int y) {
 void Timer(int m) {
 
 	// implement your functionality here
-
+	glutPostRedisplay();
 	// once again we tell the library to call our Timer function after next 1000/FPS
-	glutTimerFunc(1000.0, Timer, 0);
+	glutTimerFunc(1000.0 / 60, Timer, 0);
 }
 
 /*This function is called (automatically) whenever your mouse moves witin inside the game window
@@ -153,11 +166,12 @@ void Timer(int m) {
  *
  * */
 void MousePressedAndMoved(int x, int y) {
-	cout << x << " " << y << endl;
+	// cout << x << " " << y << endl;
 	glutPostRedisplay();
 }
 void MouseMoved(int x, int y) {
-	//cout << x << " " << y << endl;
+	// cout << x << " " << y << endl;
+	game.set_board_b(x);
 	glutPostRedisplay();
 }
 
@@ -173,12 +187,12 @@ void MouseClicked(int button, int state, int x, int y) {
 
 	if (button == GLUT_LEFT_BUTTON) // dealing only with left button
 	{
-		cout << GLUT_DOWN << " " << GLUT_UP << endl;
+		// cout << GLUT_DOWN << " " << GLUT_UP << endl;
 
 	}
 	else if (button == GLUT_RIGHT_BUTTON) // dealing with right button
 	{
-		cout << "Right Button Pressed" << endl;
+		// cout << "Right Button Pressed" << endl;
 
 	}
 	glutPostRedisplay();
@@ -190,7 +204,7 @@ int main(int argc, char* argv[]) {
 
 	game.init();
 
-	int width = 1000, height = 600; // i have set my window size to be 800 x 600
+	int width = 1000, height = 600; // i have set my window size to be 1000 x 600
 
 	InitRandomizer(); // seed the random number generator...
 	glutInit(&argc, argv); // initialize the graphics library...
