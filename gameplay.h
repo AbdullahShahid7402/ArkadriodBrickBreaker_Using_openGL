@@ -125,7 +125,7 @@ public:
         DrawString10(10, 400, "Highest score = " + to_string(highscore), colors[col]);
         DrawString10(10, 300, Name, colors[WHITE]);
         DrawString10(10, 250, RollNumber, colors[WHITE]);
-        DrawString10(10, 100, "Press 'P' to pause the game", colors[WHITE]);
+        DrawString10(10, 100, "Press 'P' to pause the game", colors[YELLOW]);
     }
 
     // ball out of bounds to reduce life
