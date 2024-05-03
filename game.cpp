@@ -98,7 +98,7 @@ void NonPrintableKeys(int key, int x, int y) {
 	/* This function calls the Display function to redo the drawing. Whenever you need to redraw just call
 	 * this function*/
 
-	glutPostRedisplay();
+	 // glutPostRedisplay();
 
 }
 
@@ -112,15 +112,22 @@ void PrintableKeys(unsigned char key, int x, int y) {
 		exit(1); // exit the program when escape key is pressed.
 	}
 
-	if (key == 'p' || key == 'P') //Key for placing the bomb
+	if (game.get_stage() == 0 && key == 'n' || key == 'N') //Key for New Game
+	{
+		// new game
+		game.reset_gameplay();
+		// set stage to move to game play
+		game.set_stage(1);
+	}
+	if (game.get_stage() == 0 && game.canContinue() && key == 'c' || key == 'C') //Key for New Game
 	{
 		// set stage to move to game play
-		int stage = game.get_stage();
-		if (stage == 0)
-		{
-			game.set_stage(1);
-		}
-
+		game.set_stage(1);
+	}
+	if (game.get_stage() == 1 && key == 'p' || key == 'P') //Key for New Game
+	{
+		// set stage to move to game play
+		game.set_stage(0);
 	}
 	// if (key == 'e' || key == 'E') //Key for placing the bomb
 	// {
@@ -140,7 +147,7 @@ void PrintableKeys(unsigned char key, int x, int y) {
 		x += 10;
 		game.set_board_t(x);
 	}
-	glutPostRedisplay();
+	// glutPostRedisplay();
 }
 
 /*
@@ -167,12 +174,13 @@ void Timer(int m) {
  * */
 void MousePressedAndMoved(int x, int y) {
 	// cout << x << " " << y << endl;
-	glutPostRedisplay();
+	// glutPostRedisplay();
 }
 void MouseMoved(int x, int y) {
 	// cout << x << " " << y << endl;
-	game.set_board_b(x);
-	glutPostRedisplay();
+	if (game.get_stage() == 1)
+		game.set_board_b(x);
+	// glutPostRedisplay();
 }
 
 /*This function is called (automatically) whenever your mouse button is clicked witin inside the game window
@@ -195,7 +203,7 @@ void MouseClicked(int button, int state, int x, int y) {
 		// cout << "Right Button Pressed" << endl;
 
 	}
-	glutPostRedisplay();
+	// glutPostRedisplay();
 }
 /*
  * our gateway main function
@@ -222,7 +230,7 @@ int main(int argc, char* argv[]) {
 	glutSpecialFunc(NonPrintableKeys); // tell library which function to call for non-printable ASCII characters
 	glutKeyboardFunc(PrintableKeys); // tell library which function to call for printable ASCII characters
 	// This function tells the library to call our Timer function after 1000.0/FPS milliseconds...
-	glutTimerFunc(1000.0, Timer, 0);
+	glutTimerFunc(1000.0 / 60, Timer, 0);
 
 	glutMouseFunc(MouseClicked);
 	glutPassiveMotionFunc(MouseMoved); // Mouse

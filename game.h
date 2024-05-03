@@ -7,28 +7,10 @@ using namespace std;
 class Game
 {
 private:
-
     GamePlay* gameplay;
     int stage;
     int width, height;
 
-    // Function to draw text on the screen
-    void drawText(const string& text, float x, float y, bool small = false) {
-        if (small)
-        {
-            glRasterPos2f(x, y); // Set the position for the text
-            for (const char& c : text) {
-                glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_10, c); // Draw each character of the string
-            }
-        }
-        else
-        {
-            glRasterPos2f(x, y); // Set the position for the text
-            for (const char& c : text) {
-                glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, c); // Draw each character of the string
-            }
-        }
-    }
 public:
 
     Game(){ init(); }
@@ -46,8 +28,6 @@ public:
     // draw the components that are supposed to be on the display
     void draw_stage()
     {
-        if (gameplay == nullptr)
-            gameplay = new GamePlay;
         switch (stage)
         {
         case 0:
@@ -63,17 +43,35 @@ public:
     // Draw the main menu
     void stage_0()
     {
-        drawText("Brick Breaker", width / 2 - 60, height / 3 * 2 + 100);
-        drawText("Press 'P' to play", width / 2 - 70, height / 3 + 50);
-        drawText("Press 'Esc' to Exit", width / 2 - 72, height / 3 + 0);
+        int newGamecol = (gameplay == nullptr) ? (YELLOW) : (GREEN);
+        DrawString(width / 2 - 60, height / 3 * 2 + 100, "Brick Breaker", colors[WHITE]);
+        DrawString(width / 2 - 110, height / 3 + 50, "Press 'N' to start new Game", colors[newGamecol]);
+        DrawString(width / 2 - 72, height / 3 + 0, "Press 'Esc' to Exit", colors[RED]);
+        if (gameplay != nullptr)
+            DrawString(width / 2 - 80, height / 3 + 100, "Press 'C' to continue", colors[YELLOW]);
     }
 
     void stage_1()
     {
+        if (gameplay == nullptr)
+            gameplay = new GamePlay;
         // DrawSquare(0, 0, 100, colors[RED]);
         gameplay[0].draw_game();
     }
 
+    void reset_gameplay()
+    {
+        if (gameplay != nullptr)
+        {
+            gameplay->save_current_score();
+            delete gameplay;
+        }
+        gameplay = new GamePlay;
+    }
+    bool canContinue()
+    {
+        return (gameplay != nullptr);
+    }
     int get_stage()
     {
         return stage;
