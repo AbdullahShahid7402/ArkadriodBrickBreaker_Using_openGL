@@ -109,6 +109,7 @@ void NonPrintableKeys(int key, int x, int y) {
  * */
 void PrintableKeys(unsigned char key, int x, int y) {
 	if (key == 27/* Escape key ASCII*/) {
+		game.reset_gameplay();
 		exit(1); // exit the program when escape key is pressed.
 	}
 
