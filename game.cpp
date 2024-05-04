@@ -7,7 +7,7 @@
 //============================================================================
 #ifndef Game_CPP
 #define Game_CPP
-#include "game.h"
+#include "gameObject.h"
 #include "util.h"
 #include <iostream>
 #include<string>

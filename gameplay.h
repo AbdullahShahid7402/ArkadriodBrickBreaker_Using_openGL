@@ -17,6 +17,7 @@ private:
     int score;
     int lives;
     bool highscoreBeaten;
+    bool levelChange;
 
     string Name;
     string RollNumber;
@@ -47,6 +48,8 @@ public:
     {
         Name = "Name";
         RollNumber = "RollNumber";
+
+        levelChange = true;
 
         file.open("highestscore", ios::in);
         if (file.fail())
