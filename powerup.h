@@ -4,7 +4,7 @@
 
 class Powerup
 {
-private:
+protected:
     float x, y;
     int color;
 public:
@@ -18,7 +18,7 @@ public:
     {
         // draw powerup
     }
-    virtual void power()
+    virtual string power()
     {
         // power of the object
     }

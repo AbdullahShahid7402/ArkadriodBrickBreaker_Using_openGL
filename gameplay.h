@@ -11,10 +11,12 @@ class GamePlay
 private:
     int maxBalls;
     int maxBricks;
+    int maxPowerups;
     fstream file;
     int highscore;
     Ball** balls;
     Brick** bricks;
+    Powerup** powerups;
     int brickcount;
     Board bottom_board;
     Board top_board;
@@ -22,7 +24,6 @@ private:
     int score;
     int lives;
     bool highscoreBeaten;
-    bool levelChange;
 
     string Name;
     string RollNumber;
@@ -51,12 +52,11 @@ private:
 public:
     GamePlay() :top_board(true)
     {
-        maxBalls = 10;
-        maxBricks = 300;
         Name = "Name";
         RollNumber = "RollNumber";
-
-        levelChange = true;
+        maxBalls = 10;
+        maxBricks = 300;
+        maxPowerups = 300;
 
         file.open("highestscore", ios::in);
         if (file.fail())
@@ -85,7 +85,13 @@ public:
         }
         brickcount = 0;
 
-        stage = 1;
+        powerups = new Powerup * [maxPowerups];
+        for (int i = 0;i < maxPowerups;i++)
+        {
+            powerups[i] = nullptr;
+        }
+
+        stage = 0;
     }
 
     void save_current_score()
@@ -175,9 +181,9 @@ public:
     }
     void stage_change()
     {
-        if (!levelChange)
+        if (brickcount)
             return;
-        levelChange = false;
+        stage++;
         switch (stage)
         {
         case 1:
