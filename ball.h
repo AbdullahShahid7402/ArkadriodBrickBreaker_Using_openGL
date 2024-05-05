@@ -9,10 +9,12 @@ private:
     int color;
     float speed;
     float dx, dy;
+    int radius;
     int deathTimer;
 public:
     Ball(int deathTimer_ = -1)
     {
+        radius = 5;
         x = 1000 / 2;
         y = 40;
         speed = 2.5;
@@ -28,7 +30,7 @@ public:
     }
     void draw_ball()
     {
-        DrawCircle(x, y, 5, colors[color]);
+        DrawCircle(x, y, radius, colors[color]);
     }
 
     // getters and setters
@@ -56,13 +58,13 @@ public:
     {
         return dy;
     }
-    void set_dx(float dx)
+    void set_dx(float dx_)
     {
-        this->dx = dx;
+        dx = dx_;
     }
-    void set_dy(float dy)
+    void set_dy(float dy_)
     {
-        this->dy = dy;
+        dy = dy_;
     }
     int get_color()
     {
@@ -75,6 +77,10 @@ public:
     float get_speed()
     {
         return speed;
+    }
+    int get_radius()
+    {
+        return radius;
     }
 
 };

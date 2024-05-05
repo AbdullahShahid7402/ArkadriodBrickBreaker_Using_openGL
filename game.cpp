@@ -163,7 +163,7 @@ void Timer(int m) {
 	// implement your functionality here
 	glutPostRedisplay();
 	// once again we tell the library to call our Timer function after next 1000/FPS
-	glutTimerFunc(1000.0 / 60, Timer, 0);
+	glutTimerFunc(1000.0 / game.get_FPS(), Timer, 0);
 }
 
 /*This function is called (automatically) whenever your mouse moves witin inside the game window
@@ -231,7 +231,7 @@ int main(int argc, char* argv[]) {
 	glutSpecialFunc(NonPrintableKeys); // tell library which function to call for non-printable ASCII characters
 	glutKeyboardFunc(PrintableKeys); // tell library which function to call for printable ASCII characters
 	// This function tells the library to call our Timer function after 1000.0/FPS milliseconds...
-	glutTimerFunc(1000.0 / 60, Timer, 0);
+	glutTimerFunc(1000.0 / game.get_FPS(), Timer, 0);
 
 	glutMouseFunc(MouseClicked);
 	glutPassiveMotionFunc(MouseMoved); // Mouse

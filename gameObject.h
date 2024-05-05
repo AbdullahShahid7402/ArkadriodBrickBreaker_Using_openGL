@@ -7,6 +7,7 @@ using namespace std;
 class Game
 {
 private:
+    int fps;
     GamePlay* gameplay;
     int stage;
     int width, height;
@@ -19,6 +20,7 @@ public:
     // initialize the game components for the game startup
     void init()
     {
+        fps = 60;
         gameplay = nullptr;
         stage = 0;
         width = 1000;
@@ -97,6 +99,10 @@ public:
     void set_board_t(float x)
     {
         gameplay[0].set_board_t(x);
+    }
+    int get_FPS()
+    {
+        return fps;
     }
 };
 

@@ -2,15 +2,20 @@
 #define GAMEPLAY_H
 #include "board.h"
 #include "ball.h"
+#include "brick.h"
 #include <fstream>
 #include <cmath>
 
 class GamePlay
 {
 private:
+    int maxBalls;
+    int maxBricks;
     fstream file;
     int highscore;
     Ball** balls;
+    Brick** bricks;
+    int brickcount;
     Board bottom_board;
     Board top_board;
     int stage;
@@ -46,6 +51,8 @@ private:
 public:
     GamePlay() :top_board(true)
     {
+        maxBalls = 10;
+        maxBricks = 300;
         Name = "Name";
         RollNumber = "RollNumber";
 
@@ -64,18 +71,26 @@ public:
         highscoreBeaten = false;
         score = 0;
         lives = 3;
-        balls = new Ball * [500];
-        for (int i = 0;i < 500;i++)
+        balls = new Ball * [maxBalls];
+        for (int i = 0;i < maxBalls;i++)
         {
             balls[i] = nullptr;
         }
         balls[0] = new Ball;
+
+        bricks = new Brick * [maxBricks];
+        for (int i = 0;i < maxBricks;i++)
+        {
+            bricks[i] = nullptr;
+        }
+        brickcount = 0;
+
         stage = 1;
     }
 
     void save_current_score()
     {
-        if (score <= highscore)
+        if (score < highscore)
             return;
         file.open("highestscore", ios::out);
         file << score;
@@ -84,18 +99,19 @@ public:
 
     void draw_game()
     {
+        stage_change();
         if (score > highscore)
         {
             highscore = score;
             highscoreBeaten = true;
         }
 
-        for (int i = 0;i < 500;i++)
+        for (int i = 0;i < maxBalls;i++)
         {
             if (balls[i] != nullptr)
             {
                 balls[i] = ball_out_of_bounds(balls[i], (i == 0));
-                if (!i && balls[0] == nullptr)
+                if (!i && balls[i] == nullptr)
                 {
                     balls[0] = new Ball;
                 }
@@ -109,6 +125,33 @@ public:
                 }
             }
         }
+
+        for (int i = 0;i < maxBalls;i++)
+        {
+            for (int j = 0;j < maxBricks;j++)
+            {
+                if (balls[i] != nullptr && bricks[j] != nullptr)
+                {
+                    ball_bounce_brick(bricks[j], balls[i]);
+                    if (bricks[j]->get_lives() == 0)
+                    {
+                        score += bricks[j]->get_score();
+                        delete bricks[j];
+                        bricks[j] = nullptr;
+                        brickcount--;
+                    }
+                }
+            }
+        }
+
+        for (int i = 0;i < maxBricks;i++)
+        {
+            if (bricks[i] != nullptr)
+            {
+                bricks[i]->draw();
+            }
+        }
+
         bottom_board.draw_board();
         if (stage == 3)
         {
@@ -130,12 +173,88 @@ public:
         DrawString10(10, 250, RollNumber, colors[WHITE]);
         DrawString10(10, 100, "Press 'P' to pause the game", colors[YELLOW]);
     }
+    void stage_change()
+    {
+        if (!levelChange)
+            return;
+        levelChange = false;
+        switch (stage)
+        {
+        case 1:
+            stage01();
+            break;
+        default:
+            return;
+        }
+    }
+    void stage01()
+    {
+        int COLORS[] = { GREEN,PINK,YELLOW,BLUE,RED };
+        int SCORES[] = { 1,2,3,4,5 };
+        int type = 0;
+        for (int i = 0;i < 10;i++)
+        {
+            for (int j = 0;j < 4;j++)
+            {
+                int life = 0;
+                if (type % 5 == 0)
+                    life = 1;
+                else if (type % 5 > 0 && type % 5 <= 2)
+                    life = 2;
+                else
+                    life = 3;
+
+                bricks[brickcount++] = new Brick(i * 40 + 10 + 200 + 100, j * 20 + 400, life, COLORS[type % 5], SCORES[type % 5]);
+                type++;
+            }
+        }
+    }
+
+    // brick bounce mechanics
+    void ball_bounce_brick(Brick* brick, Ball* ball)
+    {
+        float bx = brick->get_x(), by = brick->get_y();
+        float x = ball->get_x(), y = ball->get_y();
+        float dx = ball->get_dx(), dy = ball->get_dy();
+
+        bool hit = false;
+        if (abs(y - by) - ball->get_radius() <= 20 / 2 && abs(x - bx) - ball->get_radius() <= 40 / 2)
+        {
+            if (abs(y - by) - ball->get_radius() <= 20 / 2 && abs(x - bx) - ball->get_radius() > 40 / 2 - ball->get_speed())
+            {
+                x -= dx;
+                dx *= -1;
+                if (!hit)
+                {
+                    hit = true;
+                    brick->hit();
+                    ball->set_color(brick->get_color());
+                }
+            }
+            if (abs(x - bx) - ball->get_radius() <= 40 / 2 && abs(y - by) - ball->get_radius() > 20 / 2 - ball->get_speed())
+            {
+                y -= dy;
+                dy *= -1;
+                if (!hit)
+                {
+                    hit = true;
+                    brick->hit();
+                    ball->set_color(brick->get_color());
+                }
+            }
+        }
+        ball->set_x(x);
+        ball->set_y(y);
+        ball->set_dx(dx);
+        ball->set_dy(dy);
+    }
+
 
     // ball out of bounds to reduce life
     Ball* ball_out_of_bounds(Ball* ball, bool Parent = true)
     {
         float y = ball->get_y();
-        if (y < 10 || y>610)
+        if (y < -10 || y>610)
         {
             if (Parent)
                 lives--;
@@ -159,7 +278,7 @@ public:
                 width *= 1.5;
             if (bottom_board.isSmall())
                 width /= 1.5;
-            if (abs(x - bx) <= width / 2)
+            if (abs(x - bx) - ball->get_radius() <= width / 2)
             {
                 dx = (x - bx) / (15 * 2);
                 if (bottom_board.isLarge())
