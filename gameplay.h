@@ -214,6 +214,7 @@ public:
         DrawString10(10, 450, "Score = " + to_string(score), colors[WHITE]);
         int col = highscoreBeaten ? YELLOW : WHITE;
         DrawString10(10, 400, "Highest score = " + to_string(highscore), colors[col]);
+        DrawString10(10, 350, "Level = " + to_string(stage), colors[col]);
         DrawString10(10, 300, Name, colors[WHITE]);
         DrawString10(10, 250, RollNumber, colors[WHITE]);
         DrawString10(10, 100, "Press 'P' to pause the game", colors[YELLOW]);
@@ -320,8 +321,6 @@ public:
         row_wise_bl(0, 6, 1, 1, 500, 300);
         row_wise_br(6, 0, -1, -1, 500 - 6 * 20, 300 + 10 * 5);
         row_wise_bl(6, 0, -1, -1, 500 + 6 * 20, 300 + 10 * 5);
-
-
     }
     void row_wise_br(int current, int max, int incrementa, int incrementb, int x, int y)
     {
