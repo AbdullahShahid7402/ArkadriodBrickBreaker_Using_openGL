@@ -225,6 +225,7 @@ public:
         if (brickcount)
             return;
         stage++;
+        balls[0] = nullptr;
         switch (stage)
         {
         case 1:
