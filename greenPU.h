@@ -11,9 +11,10 @@ public:
         DrawTriangle(x, y + 2.5, x - 2.5, y - 2.5, x + 2.5, y - 2.5, colors[GREEN]);
     }
 
-    string power()
+    void power(Board* bottom, Board* top, int& fast, int& slow, Ball** AddBall)
     {
-        return "Green";
+        bottom->make_large();
+        top->make_large();
     }
 };
 

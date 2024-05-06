@@ -11,9 +11,9 @@ public:
         DrawRectangle(x - 5, y - 5, 10, 5, colors[RED]);
     }
 
-    string power()
+    void power(Board* bottom, Board* top, int& fast, int& slow, Ball** AddBall)
     {
-        return "Red";
+        fast = 5 * 60;
     }
 };
 

@@ -1,7 +1,11 @@
 #ifndef BRICK_H
 #define BRICK_H
 #include "util.h"
-#include "powerup.h"
+#include "greenPU.h"
+#include "yellowPU.h"
+#include "pinkPU.h"
+#include "bluePU.h"
+#include "redPU.h"
 
 class Brick
 {
@@ -28,7 +32,16 @@ public:
 
     Powerup* get_powerup()
     {
-        return (new Powerup);
+        if (color == GREEN)
+            return new GreenPU;
+        if (color == YELLOW)
+            return new YellowPU;
+        if (color == PINK)
+            return new PinkPU;
+        if (color == BLUE)
+            return new BluePU;
+        if (color == RED)
+            return new RedPU;
     }
 
     // getters setters

@@ -12,6 +12,7 @@ private:
     int maxBalls;
     int maxBricks;
     int maxPowerups;
+    int currentPowerup;
     fstream file;
     int highscore;
     Ball** balls;
@@ -24,6 +25,8 @@ private:
     int score;
     int lives;
     bool highscoreBeaten;
+
+    int fastBall, slowBall;
 
     string Name;
     string RollNumber;
@@ -57,6 +60,9 @@ public:
         maxBalls = 10;
         maxBricks = 300;
         maxPowerups = 300;
+        currentPowerup = 0;
+
+        fastBall = slowBall = 0;
 
         file.open("highestscore", ios::in);
         if (file.fail())
@@ -122,7 +128,7 @@ public:
                     balls[0] = new Ball;
                 }
                 balls[i]->draw_ball();
-                balls[i]->mov_ball();
+                balls[i]->mov_ball(fastBall, slowBall);
                 ball_wall_bounce(balls[i]);
                 ball_board_bounce(balls[i], bottom_board);
                 if (stage == 3)
@@ -142,6 +148,7 @@ public:
                     if (bricks[j]->get_lives() == 0)
                     {
                         score += bricks[j]->get_score();
+                        powerups[(currentPowerup++) % maxPowerups] = bricks[j]->get_powerup();
                         delete bricks[j];
                         bricks[j] = nullptr;
                         brickcount--;
@@ -155,6 +162,18 @@ public:
             if (bricks[i] != nullptr)
             {
                 bricks[i]->draw();
+            }
+        }
+        for (int i = 0;i < maxPowerups;i++)
+        {
+            if (powerups[i] != nullptr)
+            {
+                powerups[i]->draw();
+                if (powerup_collect(powerups[i]))
+                {
+                    delete powerups[i];
+                    powerups[i] = nullptr;
+                }
             }
         }
 
@@ -216,6 +235,24 @@ public:
         }
     }
 
+    // check collision on board and powerups
+    bool powerup_collect(Powerup* PU)
+    {
+        int x = PU->get_x();
+        int y = PU->get_y();
+        int width = 150;
+        if (bottom_board.isLarge())
+            width *= 2;
+        if (bottom_board.isSmall())
+            width /= 2;
+        if (abs(y - bottom_board.get_y()) <= 10 && abs(x - bottom_board.get_x()) <= width)
+        {
+            PU->power(&bottom_board, &top_board, fastBall, slowBall, balls);
+            return true;
+        }
+        return false;
+    }
+
     // brick bounce mechanics
     void ball_bounce_brick(Brick* brick, Ball* ball)
     {
@@ -226,7 +263,7 @@ public:
         bool hit = false;
         if (abs(y - by) - ball->get_radius() <= 20 / 2 && abs(x - bx) - ball->get_radius() <= 40 / 2)
         {
-            if (abs(y - by) - ball->get_radius() <= 20 / 2 && abs(x - bx) - ball->get_radius() > 40 / 2 - ball->get_speed())
+            if (abs(y - by) - ball->get_radius() <= 20 / 2 && abs(x - bx) - ball->get_radius() > 40 / 2 - ball->get_speed(fastBall, slowBall))
             {
                 x -= dx;
                 dx *= -1;
@@ -237,7 +274,7 @@ public:
                     ball->set_color(brick->get_color());
                 }
             }
-            if (abs(x - bx) - ball->get_radius() <= 40 / 2 && abs(y - by) - ball->get_radius() > 20 / 2 - ball->get_speed())
+            if (abs(x - bx) - ball->get_radius() <= 40 / 2 && abs(y - by) - ball->get_radius() > 20 / 2 - ball->get_speed(fastBall, slowBall))
             {
                 y -= dy;
                 dy *= -1;
@@ -281,23 +318,23 @@ public:
             y -= dy;
             int width = 150;
             if (bottom_board.isLarge())
-                width *= 1.5;
+                width *= 2;
             if (bottom_board.isSmall())
-                width /= 1.5;
+                width /= 2;
             if (abs(x - bx) - ball->get_radius() <= width / 2)
             {
                 dx = (x - bx) / (15 * 2);
                 if (bottom_board.isLarge())
-                    dx /= 1.5;
+                    dx /= 2;
                 if (bottom_board.isSmall())
-                    dx *= 1.5;
+                    dx *= 2;
                 if (dy < 0)
-                    dy = ball->get_speed();
+                    dy = ball->get_speed(fastBall, slowBall);
                 else
-                    dy = -ball->get_speed();
+                    dy = -ball->get_speed(fastBall, slowBall);
 
-                float new_dx = dx / sqrt(dx * dx + dy * dy) * ball->get_speed();
-                float new_dy = dy / sqrt(dx * dx + dy * dy) * ball->get_speed();
+                float new_dx = dx / sqrt(dx * dx + dy * dy) * ball->get_speed(fastBall, slowBall);
+                float new_dy = dy / sqrt(dx * dx + dy * dy) * ball->get_speed(fastBall, slowBall);
                 dx = new_dx;
                 dy = new_dy;
                 board.change_color(ball->get_color());

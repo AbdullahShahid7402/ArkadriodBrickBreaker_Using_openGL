@@ -12,9 +12,9 @@ private:
     int radius;
     int deathTimer;
 public:
-    Ball(int deathTimer_ = -1)
+    Ball(int deathTimer_ = -1, int radius_ = 5)
     {
-        radius = 5;
+        radius = radius_;
         x = 1000 / 2;
         y = 40;
         speed = 2.5;
@@ -23,10 +23,25 @@ public:
         dy = speed;
         deathTimer = deathTimer_;
     }
-    void mov_ball()
+    void mov_ball(bool fast, bool slow)
     {
-        x += dx;
-        y += dy;
+        int dx_ = dx;
+        int dy_ = dy;
+        if (fast)
+        {
+            dx_ *= 2;
+            dy_ *= 2;
+        }
+        if (slow)
+        {
+            dx_ /= 2;
+            dy_ /= 2;
+        }
+
+        x += dx_;
+        y += dy_;
+        if (deathTimer > 0)
+            deathTimer--;
     }
     void draw_ball()
     {
@@ -74,13 +89,22 @@ public:
     {
         color = Color;
     }
-    float get_speed()
+    float get_speed(bool fast, bool slow)
     {
-        return speed;
+        int s = speed;
+        if (fast)
+            s *= 2;
+        if (slow)
+            s /= 2;
+        return s;
     }
     int get_radius()
     {
         return radius;
+    }
+    bool isDead()
+    {
+        return (deathTimer == 0);
     }
 
 };

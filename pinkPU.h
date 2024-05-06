@@ -11,9 +11,10 @@ public:
         DrawSquare(x - 2.5, y - 2.5, 5, colors[PINK]);
     }
 
-    string power()
+    void power(Board* bottom, Board* top, int& fast, int& slow, Ball** AddBall)
     {
-        return "Pink";
+        bottom->make_small();
+        top->make_small();
     }
 };
 

@@ -1,6 +1,8 @@
 #ifndef POWERUP_H
 #define POWERUP_H
 #include "util.h"
+#include "board.h"
+#include "ball.h"
 
 class Powerup
 {
@@ -18,9 +20,19 @@ public:
     {
         // draw powerup
     }
-    virtual string power()
+    virtual void power(Board* bottom, Board* top, int& fast, int& slow, Ball** AddBall)
     {
         // power of the object
+    }
+
+    int get_x()
+    {
+        return x;
+    }
+
+    int get_y()
+    {
+        return y;
     }
 };
 

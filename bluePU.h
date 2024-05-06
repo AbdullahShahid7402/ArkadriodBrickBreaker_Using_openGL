@@ -11,9 +11,9 @@ public:
         DrawCircle(x, y, 2.5, colors[BLUE]);
     }
 
-    string power()
+    void power(Board* bottom, Board* top, int& fast, int& slow, Ball** AddBall)
     {
-        return "Blue";
+        slow = 5 * 60;
     }
 };
 
