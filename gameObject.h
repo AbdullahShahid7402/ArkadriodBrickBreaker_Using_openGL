@@ -37,6 +37,13 @@ public:
             break;
         case 1:
             stage_1();
+            break;
+        case 2:
+            stage_2();
+            break;
+        case 3:
+            stage_3();
+            break;
         default:
             return;
         }
@@ -59,6 +66,28 @@ public:
             gameplay = new GamePlay;
         // DrawSquare(0, 0, 100, colors[RED]);
         gameplay[0].draw_game();
+        if (gameplay[0].get_stage() > 3)
+        {
+            int stage = gameplay[0].get_stage();
+            gameplay[0].save_current_score();
+            delete gameplay;
+            gameplay = nullptr;
+            if (stage == 4)
+                this->stage = 2;
+            else
+                this->stage = 3;
+        }
+    }
+
+    void stage_2()
+    {
+        DrawString(width / 2 - 60, height / 3 * 2 + 100, "YOU WIN", colors[GOLD]);
+        DrawString(width / 2 - 72, height / 3 + 0, "Press 'M' to go to main menu", colors[RED]);
+    }
+    void stage_3()
+    {
+        DrawString(width / 2 - 60, height / 3 * 2 + 100, "GAME OVER", colors[RED]);
+        DrawString(width / 2 - 72, height / 3 + 0, "Press 'M' to go to main menu", colors[RED]);
     }
 
     void reset_gameplay()

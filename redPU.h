@@ -5,13 +5,19 @@
 class RedPU : public Powerup
 {
 public:
+    RedPU(int x_ = 0, int y_ = 0, int color_ = GRAY)
+    {
+        x = x_;
+        y = y_;
+        color = color_;
+    }
     void draw()
     {
         y--;
-        DrawRectangle(x - 5, y - 5, 10, 5, colors[RED]);
+        DrawRectangle(x - 10, y - 10, 20, 10, colors[RED]);
     }
 
-    void power(Board* bottom, Board* top, int& fast, int& slow, Ball** AddBall)
+    void power(Board* bottom, Board* top, int& fast, int& slow, Ball** AddBall, int AddBalln)
     {
         fast = 5 * 60;
     }

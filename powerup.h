@@ -20,7 +20,7 @@ public:
     {
         // draw powerup
     }
-    virtual void power(Board* bottom, Board* top, int& fast, int& slow, Ball** AddBall)
+    virtual void power(Board* bottom, Board* top, int& fast, int& slow, Ball** AddBall, int AddBalln)
     {
         // power of the object
     }

@@ -12,6 +12,7 @@
 #include <iostream>
 #include<string>
 #include<cmath> // for basic math functions such as cos, sin, sqrt
+#include <ctime>// for random functionality as mensioned in rubrics
 using namespace std;
 
 // --------------------------------------------------------
@@ -108,11 +109,14 @@ void NonPrintableKeys(int key, int x, int y) {
  * program coordinates of mouse pointer when key was pressed.
  * */
 void PrintableKeys(unsigned char key, int x, int y) {
-	if (key == 27/* Escape key ASCII*/) {
+	if (game.get_stage() == 0 && key == 27/* Escape key ASCII*/) {
 		game.reset_gameplay();
 		exit(1); // exit the program when escape key is pressed.
 	}
-
+	if (game.get_stage() > 1 && key == 'm' || key == 'M') //Key for New Game
+	{
+		game.set_stage(0);
+	}
 	if (game.get_stage() == 0 && key == 'n' || key == 'N') //Key for New Game
 	{
 		// new game
@@ -213,6 +217,7 @@ int main(int argc, char* argv[]) {
 
 	game.init();
 
+	srand(time(0));
 	int width = 1000, height = 600; // i have set my window size to be 1000 x 600
 
 	InitRandomizer(); // seed the random number generator...

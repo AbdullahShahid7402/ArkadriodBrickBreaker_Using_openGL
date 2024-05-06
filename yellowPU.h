@@ -5,13 +5,19 @@
 class YellowPU : public Powerup
 {
 public:
+    YellowPU(int x_ = 0, int y_ = 0, int color_ = GRAY)
+    {
+        x = x_;
+        y = y_;
+        color = color_;
+    }
     void draw()
     {
         y--;
-        DrawSquare(x - 2.5, y - 2.5, 5, colors[YELLOW]);
+        DrawSquare(x - 5, y - 5, 10, colors[YELLOW]);
     }
 
-    void power(Board* bottom, Board* top, int& fast, int& slow, Ball** AddBall)
+    void power(Board* bottom, Board* top, int& fast, int& slow, Ball** AddBall, int AddBalln)
     {
         int count = 2;
         for (int i = 0;i < AddBalln;i++)
@@ -20,7 +26,7 @@ public:
                 break;
             if (AddBall[i] == nullptr)
             {
-                AddBall[i] = new Ball(5 * 60, 2.5);
+                AddBall[i] = new Ball(5 * 60, 10);
                 count--;
                 if (count)
                 {

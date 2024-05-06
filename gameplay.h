@@ -62,7 +62,8 @@ public:
         maxPowerups = 300;
         currentPowerup = 0;
 
-        fastBall = slowBall = 0;
+        fastBall = 0;
+        slowBall = 0;
 
         file.open("highestscore", ios::in);
         if (file.fail())
@@ -111,22 +112,29 @@ public:
 
     void draw_game()
     {
+        if (stage > 3)
+        {
+            save_current_score();
+            return;
+        }
         stage_change();
+        if (fastBall)
+            fastBall--;
+        if (slowBall)
+            slowBall--;
         if (score > highscore)
         {
             highscore = score;
             highscoreBeaten = true;
         }
 
+        if (balls[0] == nullptr)
+            balls[0] = new Ball;
+
         for (int i = 0;i < maxBalls;i++)
         {
             if (balls[i] != nullptr)
             {
-                balls[i] = ball_out_of_bounds(balls[i], (i == 0));
-                if (!i && balls[i] == nullptr)
-                {
-                    balls[0] = new Ball;
-                }
                 balls[i]->draw_ball();
                 balls[i]->mov_ball(fastBall, slowBall);
                 ball_wall_bounce(balls[i]);
@@ -135,6 +143,13 @@ public:
                 {
                     ball_board_bounce(balls[i], top_board);
                 }
+                balls[i] = ball_out_of_bounds(balls[i], (i == 0));
+                if (balls[i] != nullptr)
+                    if (balls[i]->isDead())
+                    {
+                        delete balls[i];
+                        balls[i] = nullptr;
+                    }
             }
         }
 
@@ -148,6 +163,11 @@ public:
                     if (bricks[j]->get_lives() == 0)
                     {
                         score += bricks[j]->get_score();
+                        while (powerups[currentPowerup] != nullptr)
+                        {
+                            currentPowerup++;
+                        }
+
                         powerups[(currentPowerup++) % maxPowerups] = bricks[j]->get_powerup();
                         delete bricks[j];
                         bricks[j] = nullptr;
@@ -169,7 +189,7 @@ public:
             if (powerups[i] != nullptr)
             {
                 powerups[i]->draw();
-                if (powerup_collect(powerups[i]))
+                if (powerup_collect(powerups[i]) || powerups[i]->get_y() < -10)
                 {
                     delete powerups[i];
                     powerups[i] = nullptr;
@@ -200,6 +220,8 @@ public:
     }
     void stage_change()
     {
+        if (lives == 0)
+            stage = 5;
         if (brickcount)
             return;
         stage++;
@@ -207,6 +229,13 @@ public:
         {
         case 1:
             stage01();
+            break;
+        case 2:
+            stage02();
+            break;
+        case 3:
+            stage03();
+            // brickcount = 1;
             break;
         default:
             return;
@@ -219,8 +248,9 @@ public:
         int type = 0;
         for (int i = 0;i < 10;i++)
         {
-            for (int j = 0;j < 4;j++)
+            for (int j = 0;j < 5;j++)
             {
+                type = rand();
                 int life = 0;
                 if (type % 5 == 0)
                     life = 1;
@@ -229,10 +259,124 @@ public:
                 else
                     life = 3;
 
-                bricks[brickcount++] = new Brick(i * 40 + 10 + 200 + 100, j * 20 + 400, life, COLORS[type % 5], SCORES[type % 5]);
-                type++;
+                bricks[brickcount] = new Brick(i * 20 + 10 + 200 + 200, j * 10 + 400, life, COLORS[type % 5], SCORES[type % 5]);
+                brickcount++;
+                // type++;
             }
         }
+    }
+    void stage02()
+    {
+        int COLORS[] = { GREEN,PINK,YELLOW,BLUE,RED };
+        int SCORES[] = { 1,2,3,4,5 };
+        int type = 0;
+        for (int k = 0;k < 3;k++)
+        {
+            for (int i = 0;i < 5;i++)
+            {
+                for (int j = 0;j < 4;j++)
+                {
+                    type = rand();
+                    int life = 0;
+                    if (type % 5 == 0)
+                        life = 1;
+                    else if (type % 5 > 0 && type % 5 <= 2)
+                        life = 2;
+                    else
+                        life = 3;
+
+                    bricks[brickcount] = new Brick((k * 20 * 5) + i * 20 + 10 + 200, (-k * 10 * 4) + j * 10 + 400, life, COLORS[type % 5], SCORES[type % 5]);
+                    brickcount++;
+                    // type++;
+                }
+            }
+        }
+        for (int k = 0;k < 2;k++)
+        {
+            for (int i = 0;i < 5;i++)
+            {
+                for (int j = 0;j < 4;j++)
+                {
+                    type = rand();
+                    int life = 0;
+                    if (type % 5 == 0)
+                        life = 1;
+                    else if (type % 5 > 0 && type % 5 <= 2)
+                        life = 2;
+                    else
+                        life = 3;
+
+                    bricks[brickcount] = new Brick((k * 20 * 5) + i * 20 + 10 + 200, (k * 10 * 4) + j * 10 + 400 - 160, life, COLORS[type % 5], SCORES[type % 5]);
+                    brickcount++;
+                    // type++;
+                }
+            }
+        }
+    }
+    void stage03()
+    {
+        row_wise_br(0, 6, 1, 1, 500, 300);
+        row_wise_bl(0, 6, 1, 1, 500, 300);
+        row_wise_br(6, 0, -1, -1, 500 - 6 * 20, 300 + 10 * 5);
+        row_wise_bl(6, 0, -1, -1, 500 + 6 * 20, 300 + 10 * 5);
+
+
+    }
+    void row_wise_br(int current, int max, int incrementa, int incrementb, int x, int y)
+    {
+        if (current == max)
+            return;
+        column_wise_br(current, max, incrementb, current, x, y);
+        row_wise_br(current + incrementa, max, incrementa, incrementb, x, y);
+    }
+    void column_wise_br(int current, int max, int increment, int i, int x, int y)
+    {
+        if (current == max)
+            return;
+
+        int COLORS[] = { GREEN,PINK,YELLOW,BLUE,RED };
+        int SCORES[] = { 1,2,3,4,5 };
+        int life = 0;
+        if (brickcount % 5 == 0)
+            life = 1;
+        else if (brickcount % 5 > 0 && brickcount % 5 <= 2)
+            life = 2;
+        else
+            life = 3;
+
+        bricks[brickcount] = new Brick(current * 20 + x, i * 10 + y, life, COLORS[brickcount % 5], SCORES[brickcount % 5]);
+        brickcount++;
+        column_wise_br(current + increment, max, increment, i, x, y);
+    }
+    void row_wise_bl(int current, int max, int incrementa, int incrementb, int x, int y)
+    {
+        if (current == max)
+            return;
+        column_wise_bl(current, max, incrementb, current, x, y);
+        row_wise_bl(current + incrementa, max, incrementa, incrementb, x, y);
+    }
+    void column_wise_bl(int current, int max, int increment, int i, int x, int y)
+    {
+        if (current == max)
+            return;
+        if (current == 0)
+            current++;
+        if (current == 6)
+            current--;
+
+        int COLORS[] = { GREEN,PINK,YELLOW,BLUE,RED };
+        int SCORES[] = { 1,2,3,4,5 };
+        int life = 0;
+        if (brickcount % 5 == 0)
+            life = 1;
+        else if (brickcount % 5 > 0 && brickcount % 5 <= 2)
+            life = 2;
+        else
+            life = 3;
+
+        bricks[brickcount] = new Brick(-current * 20 + x, i * 10 + y, life, COLORS[brickcount % 5], SCORES[brickcount % 5]);
+        brickcount++;
+        column_wise_bl(current + increment, max, increment, i, x, y);
     }
 
     // check collision on board and powerups
@@ -247,7 +391,7 @@ public:
             width /= 2;
         if (abs(y - bottom_board.get_y()) <= 10 && abs(x - bottom_board.get_x()) <= width)
         {
-            PU->power(&bottom_board, &top_board, fastBall, slowBall, balls);
+            PU->power(&bottom_board, &top_board, fastBall, slowBall, balls, maxBalls);
             return true;
         }
         return false;
@@ -261,9 +405,9 @@ public:
         float dx = ball->get_dx(), dy = ball->get_dy();
 
         bool hit = false;
-        if (abs(y - by) - ball->get_radius() <= 20 / 2 && abs(x - bx) - ball->get_radius() <= 40 / 2)
+        if (abs(y - by) - ball->get_radius() <= brick->get_height() / 2 && abs(x - bx) - ball->get_radius() <= brick->get_width() / 2)
         {
-            if (abs(y - by) - ball->get_radius() <= 20 / 2 && abs(x - bx) - ball->get_radius() > 40 / 2 - ball->get_speed(fastBall, slowBall))
+            if (abs(y - by) - ball->get_radius() <= brick->get_height() / 2 && abs(x - bx) - ball->get_radius() > brick->get_width() / 2 - ball->get_speed(fastBall, slowBall))
             {
                 x -= dx;
                 dx *= -1;
@@ -274,7 +418,7 @@ public:
                     ball->set_color(brick->get_color());
                 }
             }
-            if (abs(x - bx) - ball->get_radius() <= 40 / 2 && abs(y - by) - ball->get_radius() > 20 / 2 - ball->get_speed(fastBall, slowBall))
+            if (abs(x - bx) - ball->get_radius() <= brick->get_width() / 2 && abs(y - by) - ball->get_radius() > brick->get_height() / 2 - ball->get_speed(fastBall, slowBall))
             {
                 y -= dy;
                 dy *= -1;
@@ -291,7 +435,6 @@ public:
         ball->set_dx(dx);
         ball->set_dy(dy);
     }
-
 
     // ball out of bounds to reduce life
     Ball* ball_out_of_bounds(Ball* ball, bool Parent = true)
@@ -391,6 +534,10 @@ public:
     void set_board_t(float x)
     {
         top_board.set_x(x);
+    }
+    int get_stage()
+    {
+        return stage;
     }
 };
 #endif

@@ -11,6 +11,7 @@ class Brick
 {
 private:
     float x, y;
+    int width, height;
     int color, lives;
     int score;
 
@@ -20,28 +21,29 @@ public:
         x = x_;
         y = y_;
         lives = lives_;
+        width = 20;
+        height = 10;
         color = color_;
         score = score_;
     }
 
     void draw()
     {
-        int width = 40;
-        DrawRectangle(x - width / 2, y - 20 / 2, width, 20, colors[color]);
+        DrawRectangle(x - width / 2, y - height / 2, width, height, colors[color]);
     }
 
     Powerup* get_powerup()
     {
         if (color == GREEN)
-            return new GreenPU;
+            return new GreenPU(x, y, color);
         if (color == YELLOW)
-            return new YellowPU;
+            return new YellowPU(x, y, color);
         if (color == PINK)
-            return new PinkPU;
+            return new PinkPU(x, y, color);
         if (color == BLUE)
-            return new BluePU;
+            return new BluePU(x, y, color);
         if (color == RED)
-            return new RedPU;
+            return new RedPU(x, y, color);
     }
 
     // getters setters
@@ -76,6 +78,14 @@ public:
     int get_score()
     {
         return score;
+    }
+    int get_width()
+    {
+        return width;
+    }
+    int get_height()
+    {
+        return height;
     }
 };
 

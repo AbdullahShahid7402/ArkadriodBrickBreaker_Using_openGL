@@ -23,16 +23,16 @@ public:
         dy = speed;
         deathTimer = deathTimer_;
     }
-    void mov_ball(bool fast, bool slow)
+    void mov_ball(int fast, int slow)
     {
-        int dx_ = dx;
-        int dy_ = dy;
-        if (fast)
+        float dx_ = dx;
+        float dy_ = dy;
+        if (fast > 0)
         {
             dx_ *= 2;
             dy_ *= 2;
         }
-        if (slow)
+        if (slow > 0)
         {
             dx_ /= 2;
             dy_ /= 2;
@@ -89,12 +89,12 @@ public:
     {
         color = Color;
     }
-    float get_speed(bool fast, bool slow)
+    float get_speed(int fast, int slow)
     {
         int s = speed;
-        if (fast)
+        if (fast > 0)
             s *= 2;
-        if (slow)
+        if (slow > 0)
             s /= 2;
         return s;
     }
